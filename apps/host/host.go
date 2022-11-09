@@ -1,11 +1,14 @@
 package host
 
+import "context"
+
 // define host app service interface
 type Service interface {
-	CreateHost()
-	DeleteHost()
-	QueryHost()
-	UpdateHost()
+	CreateHost(context.Context, *Host) (*Host, error)
+	QueryHost(context.Context, *QueryHostRequest) (*HostSet, error)
+	DescribeHost(context.Context, *QueryHostRequest) (*Host, error)
+	UpdateHost(context.Context, *UpdateHostRequest) (*Host, error)
+	DeleteHost(context.Context, *DeleteHostRequest) (*Host, error)
 }
 
 const (
@@ -14,6 +17,14 @@ const (
 	AliYun
 	HuaWei
 )
+
+func NewHost() *Host {
+	return &Host{
+		Base:     &Base{},
+		Resource: &Resource{},
+		Describe: &Describe{},
+	}
+}
 
 // define the host struct
 type Host struct {
@@ -31,7 +42,6 @@ type Base struct {
 	Region       string `json:"region"`        // 地域
 	Zone         string `json:"zone"`          // 区域
 	CreateAt     int64  `json:"create_at"`     // 创建时间
-	InstanceId   string `json:"instance_id"`   // 实例ID
 	ResourceHash string `json:"resource_hash"` // 基础数据Hash
 	DescribeHash string `json:"describe_hash"` // 描述数据Hash
 }
@@ -52,17 +62,27 @@ type Resource struct {
 }
 
 type Describe struct {
-	ResourceId              string `json:"resource_id"`                // 关联Resource
-	CPU                     int    `json:"cpu"`                        // 核数
-	Memory                  int    `json:"memory"`                     // 内存
-	GPUAmount               int    `json:"gpu_amount"`                 // GPU数量
-	GPUSpec                 string `json:"gpu_spec"`                   // GPU类型
-	OSType                  string `json:"os_type"`                    // 操作系统类型，分为Windows和Linux
-	OSName                  string `json:"os_name"`                    // 操作系统名称
-	SerialNumber            string `json:"serial_number"`              // 序列号
-	ImageID                 string `json:"image_id"`                   // 镜像ID
-	InternetMaxBandwidthOut int    `json:"internet_max_bandwidth_out"` // 公网出带宽最大值，单位为 Mbps
-	InternetMaxBandwidthIn  int    `json:"internet_max_bandwidth_in"`  // 公网入带宽最大值，单位为 Mbps
-	KeyPairName             string `json:"key_pair_name,omitempty"`    // 秘钥对名称
-	SecurityGroups          string `json:"security_groups"`            // 安全组  采用逗号分隔
+	CPU          int    `json:"cpu"`           // 核数
+	Memory       int    `json:"memory"`        // 内存
+	GPUAmount    int    `json:"gpu_amount"`    // GPU数量
+	GPUSpec      string `json:"gpu_spec"`      // GPU类型
+	OSType       string `json:"os_type"`       // 操作系统类型，分为Windows和Linux
+	OSName       string `json:"os_name"`       // 操作系统名称
+	SerialNumber string `json:"serial_number"` // 序列号
+}
+
+type HostSet struct {
+	Items []*Host
+	Total int
+}
+
+type QueryHostRequest struct {
+}
+
+type UpdateHostRequest struct {
+	*Describe
+}
+
+type DeleteHostRequest struct {
+	Id string `json:"id"`
 }
