@@ -1,6 +1,6 @@
 module github.com/summingyu/restful-api-demo
 
-go 1.19
+go 1.18
 
 require github.com/infraboard/mcube v1.9.0
 
