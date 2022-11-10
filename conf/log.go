@@ -1,5 +1,15 @@
 package conf
 
-type LogFormat int
+type LogFormat string
 
-type LogTo int
+const (
+	TextFormat = LogFormat("text")
+	JSONFormat = LogFormat("json")
+)
+
+type LogTo string
+
+const (
+	ToFile   = LogTo("file")
+	ToStdout = LogTo("stdout")
+)
