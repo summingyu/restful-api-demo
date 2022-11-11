@@ -1,6 +1,18 @@
 package conf
 
+import (
+	"context"
+	"database/sql"
+	"fmt"
+	"sync"
+	"time"
+
+	_ "github.com/go-sql-driver/mysql"
+)
+
 var config *Config
+
+var db *sql.DB
 
 func C() *Config {
 	return config
@@ -38,12 +50,42 @@ func NewDefaultMysql() *MySQL {
 	return &MySQL{
 		Host:        "127.0.0.1",
 		Port:        "3306",
-		UserName:    "demo",
+		UserName:    "root",
 		Password:    "123456",
 		Database:    "demo",
 		MaxOpenConn: 200,
 		MaxIdleConn: 100,
 	}
+}
+func (m *MySQL) GetDB() *sql.DB {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	if db == nil {
+		conn, err := m.getDBConn()
+		if err != nil {
+			panic(err)
+		}
+		db = conn
+	}
+	return db
+}
+func (m *MySQL) getDBConn() (*sql.DB, error) {
+	var err error
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&multiStatements=true", m.UserName, m.Password, m.Host, m.Port, m.Database)
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, fmt.Errorf("connect to mysql<%s> error, %s", dsn, err.Error())
+	}
+	db.SetMaxOpenConns(m.MaxOpenConn)
+	db.SetMaxIdleConns(m.MaxIdleConn)
+	db.SetConnMaxLifetime(time.Second * time.Duration(m.MaxLifeTime))
+	db.SetConnMaxIdleTime(time.Second * time.Duration(m.MaxIdleTime))
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := db.PingContext(ctx); err != nil {
+		return nil, fmt.Errorf("ping mysql<%s> error, %s", dsn, err.Error())
+	}
+	return db, nil
 }
 
 // MySQL todo
@@ -65,7 +107,7 @@ type MySQL struct {
 	MaxIdleTime int `toml:"max_idle_time" env:"MYSQL_MAX_idle_TIME"`
 
 	// 作为私有变量, 用户与控制GetDB
-	// lock sync.Mutex
+	lock sync.Mutex
 }
 
 func NewDefaultLog() *Log {

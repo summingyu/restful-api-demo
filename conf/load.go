@@ -13,12 +13,29 @@ func LoadConfigFromToml(filePath string) error {
 	if err != nil {
 		return fmt.Errorf("load config from file error, path=%s, err=%s", filePath, err)
 	}
+
 	return nil
+	// return loadGlobal()
 
 }
 
 func LoadConfigFromEnv() error {
 	config = NewDefaultConfig()
-	return env.Parse(config)
+	err := env.Parse(config)
+	if err != nil {
+		return fmt.Errorf("load config from env error, err=%s", err)
+	}
+	return nil
+	// return loadGlobal()
 
 }
+
+// func loadGlobal() error {
+// 	var err error
+// 	db, err = config.MySQL.getDBConn()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+
+// }
