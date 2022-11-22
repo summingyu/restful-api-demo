@@ -12,7 +12,15 @@ func (i *HostServiceImpl) CreateHost(ctx context.Context, ins *host.Host) (*host
 	i.l.Debug("create host")
 	i.l.Debugf("create host: %s", ins.Name)
 	i.l.With(logger.NewAny("request-id", "req01")).Debug("create host with meta kv")
-	return nil, nil
+	if err := ins.Validate(); err != nil {
+		return nil, err
+	}
+	ins.InjectDefault()
+
+	if err := i.save(ctx, ins); err != nil {
+		return nil, err
+	}
+	return ins, nil
 }
 func (i *HostServiceImpl) QueryHost(ctx context.Context, req *host.QueryHostRequest) (
 	*host.HostSet, error) {

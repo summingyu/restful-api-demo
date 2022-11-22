@@ -34,21 +34,28 @@ func (i *HostServiceImpl) save(ctx context.Context, ins *host.Host) error {
 	defer rstmt.Close()
 
 	_, err = rstmt.ExecContext(ctx,
-		ins.Account,
-		ins.CreateAt,
-		ins.Description,
-		ins.ExpireAt,
-		ins.Id,
-		ins.Name,
-		ins.PrivateIP,
-		ins.PublicIP,
-		ins.Region,
-		ins.Status,
-		ins.SyncAt,
-		ins.Type,
-		ins.UpdateAt,
-		ins.Vendor,
+		ins.Account, ins.CreateAt, ins.Description, ins.ExpireAt,
+		ins.Id, ins.Name, ins.PrivateIP, ins.PublicIP,
+		ins.Region, ins.Status, ins.SyncAt, ins.Type,
+		ins.UpdateAt, ins.Vendor,
 	)
+	if err != nil {
+		return err
+	}
+
+	dstmt, err := tx.PrepareContext(ctx, InsertDescribeSQL)
+	if err != nil {
+		return err
+	}
+	defer dstmt.Close()
+
+	_, err = dstmt.ExecContext(ctx,
+		ins.Id, ins.CPU, ins.Memory, ins.GPUAmount,
+		ins.GPUSpec, ins.OSType, ins.OSName, ins.SerialNumber,
+	)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
