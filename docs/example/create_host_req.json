@@ -1,0 +1,8 @@
+{
+  "id": "ins-02",
+  "region": "cn-shenzhen",
+  "type": "sm2",
+  "name": "testapi",
+  "cpu": 1,
+  "memory": 4096
+}
