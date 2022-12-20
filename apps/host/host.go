@@ -1,7 +1,6 @@
 package host
 
 import (
-	"context"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -9,22 +8,6 @@ import (
 
 var (
 	validate = validator.New()
-)
-
-// define host app service interface
-type Service interface {
-	CreateHost(context.Context, *Host) (*Host, error)
-	QueryHost(context.Context, *QueryHostRequest) (*HostSet, error)
-	DescribeHost(context.Context, *QueryHostRequest) (*Host, error)
-	UpdateHost(context.Context, *UpdateHostRequest) (*Host, error)
-	DeleteHost(context.Context, *DeleteHostRequest) (*Host, error)
-}
-
-const (
-	PrivateIDC Vendor = iota
-	Tencent
-	AliYun
-	HuaWei
 )
 
 func NewHost() *Host {
@@ -51,6 +34,13 @@ func (h *Host) InjectDefault() {
 }
 
 type Vendor int
+
+const (
+	PrivateIDC Vendor = iota
+	Tencent
+	AliYun
+	HuaWei
+)
 
 type Resource struct {
 	Id           string            `json:"id" validate:"required"`     // 全局唯一Id
