@@ -5,6 +5,7 @@ import (
 	"github.com/infraboard/mcube/logger/zap"
 	"github.com/spf13/cobra"
 
+	"github.com/summingyu/restful-api-demo/apps"
 	"github.com/summingyu/restful-api-demo/apps/host/http"
 	"github.com/summingyu/restful-api-demo/apps/host/impl"
 	"github.com/summingyu/restful-api-demo/conf"
@@ -26,8 +27,10 @@ var StartCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		service := impl.NewHostServiceImpl()
-		api := http.NewHostHTTPHandler(service)
+		// service := impl.NewHostServiceImpl()
+		apps.HostService = impl.NewHostServiceImpl()
+		api := http.NewHostHTTPHandler()
+		api.Config()
 		g := gin.Default()
 		api.Registry(g)
 		return g.Run(conf.C().App.HttpAddr())
