@@ -3,6 +3,8 @@ package apps
 import (
 	"fmt"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/summingyu/restful-api-demo/apps/host"
 )
 
@@ -12,27 +14,50 @@ import (
 // 2. HTTP 暴露模块, 依赖IOC里面的HostService
 var (
 	HostService host.Service
-	svcs        = map[string]Service{}
+	implApps    = map[string]ImplService{}
+	ginApps     = map[string]GinService{}
 )
 
-func Registry(svc Service) {
-	if _, ok := svcs[svc.Name()]; ok {
-		panic(fmt.Sprintf("service %s has registried", svc.Name()))
+func RegistryImpl(svc ImplService) {
+	if _, ok := implApps[svc.Name()]; ok {
+		panic(fmt.Sprintf("impl service %s has registried", svc.Name()))
 
 	}
-	svcs[svc.Name()] = svc
+	implApps[svc.Name()] = svc
 	if v, ok := svc.(host.Service); ok {
 		HostService = v
 	}
 }
 
-func Init() {
-	for _, v := range svcs {
+func RegistryGin(svc GinService) {
+	if _, ok := ginApps[svc.Name()]; ok {
+		panic(fmt.Sprintf("gin service %s has registried", svc.Name()))
+
+	}
+	ginApps[svc.Name()] = svc
+
+}
+
+func InitImpl() {
+	for _, v := range implApps {
 		v.Config()
 	}
 }
 
-type Service interface {
+func InitGin(r gin.IRouter) {
+	for _, v := range ginApps {
+		v.Config()
+		v.Registry(r)
+	}
+}
+
+type ImplService interface {
+	Config()
+	Name() string
+}
+
+type GinService interface {
+	Registry(r gin.IRouter)
 	Config()
 	Name() string
 }

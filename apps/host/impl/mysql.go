@@ -36,5 +36,5 @@ func (i *HostServiceImpl) Name() string {
 }
 
 func init() {
-	apps.Registry(impl)
+	apps.RegistryImpl(impl)
 }

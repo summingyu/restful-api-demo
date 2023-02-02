@@ -7,7 +7,6 @@ import (
 
 	"github.com/summingyu/restful-api-demo/apps"
 	_ "github.com/summingyu/restful-api-demo/apps/all"
-	"github.com/summingyu/restful-api-demo/apps/host/http"
 	"github.com/summingyu/restful-api-demo/conf"
 )
 
@@ -28,11 +27,9 @@ var StartCmd = &cobra.Command{
 			panic(err)
 		}
 		// service := impl.NewHostServiceImpl()
-		apps.Init()
-		api := http.NewHostHTTPHandler()
-		api.Config()
+		apps.InitImpl()
 		g := gin.Default()
-		api.Registry(g)
+		apps.InitGin(g)
 		return g.Run(conf.C().App.HttpAddr())
 	},
 }

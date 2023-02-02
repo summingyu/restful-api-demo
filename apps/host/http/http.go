@@ -7,10 +7,7 @@ import (
 	"github.com/summingyu/restful-api-demo/apps/host"
 )
 
-func NewHostHTTPHandler() *Handler {
-	return &Handler{}
-
-}
+var handler = &Handler{}
 
 type Handler struct {
 	svc host.Service
@@ -25,4 +22,12 @@ func (h *Handler) Config() {
 
 func (h *Handler) Registry(r gin.IRouter) {
 	r.POST("/hosts", h.createHost)
+}
+
+func (h *Handler) Name() string {
+	return host.AppName
+}
+
+func init() {
+	apps.RegistryGin(handler)
 }
