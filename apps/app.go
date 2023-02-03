@@ -29,6 +29,15 @@ func RegistryImpl(svc ImplService) {
 	}
 }
 
+func GetImpl(name string) interface{} {
+	for k, v := range implApps {
+		if k == name {
+			return v
+		}
+	}
+	return nil
+}
+
 func RegistryGin(svc GinService) {
 	if _, ok := ginApps[svc.Name()]; ok {
 		panic(fmt.Sprintf("gin service %s has registried", svc.Name()))

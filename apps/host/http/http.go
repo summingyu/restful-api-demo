@@ -14,10 +14,8 @@ type Handler struct {
 }
 
 func (h *Handler) Config() {
-	if apps.HostService == nil {
-		panic("dependence host service required")
-	}
-	h.svc = apps.HostService
+	// 空interface断言为host.Service
+	h.svc = apps.GetImpl(host.AppName).(host.Service)
 }
 
 func (h *Handler) Registry(r gin.IRouter) {
