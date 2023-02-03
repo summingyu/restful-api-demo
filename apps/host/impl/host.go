@@ -9,7 +9,8 @@ import (
 )
 
 func (i *HostServiceImpl) CreateHost(ctx context.Context, ins *host.Host) (*host.Host, error) {
-	i.l.Debug("create host")
+	i.l.Named("Create").Debug("create host")
+	i.l.Info("create host")
 	i.l.Debugf("create host: %s", ins.Name)
 	i.l.With(logger.NewAny("request-id", "req01")).Debug("create host with meta kv")
 	if err := ins.Validate(); err != nil {
