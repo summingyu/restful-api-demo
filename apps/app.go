@@ -53,6 +53,13 @@ func InitImpl() {
 	}
 }
 
+func LoadedGinApps() (names []string) {
+	for k := range ginApps {
+		names = append(names, k)
+	}
+	return
+}
+
 func InitGin(r gin.IRouter) {
 	for _, v := range ginApps {
 		v.Config()
